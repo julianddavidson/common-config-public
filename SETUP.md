@@ -159,7 +159,7 @@ Wait for them to invoke the skill explicitly. Don't proceed unilaterally — the
 
 ## Notes for Claude
 
-- **Don't include any content from `julianddavidson/common-config-public` that isn't part of the template** — specifically, the deep-dive doc is included verbatim as a worked-example reference. It mentions specific devices (PORTIA2022, trc-work1) and the maintainer's name. That's fine for reference but won't reflect the user's deployment.
+- **The bundled `docs/common-config-deep-dive.md` is a generic reference** — it describes the architecture using anonymous device names (`device-a`, `device-b`) and `<user>` placeholders. The user's deployment will have its own actual device IDs and won't match the example tree literally.
 - **Be careful with Windows backslashes** when writing `~/.claude/settings.json` later (the onboarder handles this, but if you ever edit it manually, use the `args` exec form to bypass shell parsing — see the onboarder SKILL.md step 5).
 - **Don't auto-push subsequent edits** — there's a behaviour rule in `shared.md` that says to prompt before each push. Honour it from the start.
 - **If anything fails halfway through**, stop and report. The user can re-run from the failed step rather than continuing past a broken state.

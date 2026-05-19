@@ -108,9 +108,9 @@ Each device's `~/.claude/settings.json` has a `SessionStart` hook that runs `scr
 2. Reads `claude-md/shared.md` + `devices/<id>/CLAUDE.md`
 3. Concatenates them and writes the result to `~/.claude/CLAUDE.md` (UTF-8, no BOM)
 
-Skill symlinks and memory symlinks need no refresh - they point at the repo, so once `git pull` updates the underlying file, the next file read sees the new content.
+Existing skill and memory symlinks need no refresh - they point at the repo, so once `git pull` updates the underlying file, the next file read sees the new content. For *new* skills (folders added to `<repo>/skills/` on another device), the refresh script also reconciles symlinks: any repo skill missing a corresponding `~/.claude/skills/<name>` entry gets one created automatically. Existing entries are never touched - the onboarder still handles conflicts and adoption.
 
-The composite `CLAUDE.md` is the only piece that requires regeneration. The hook handles that automatically.
+The composite `CLAUDE.md` is the piece that requires regeneration on every run. The hook handles that automatically.
 
 ## WORKED EXAMPLE - AN EDIT FROM device-a REACHES device-b
 
