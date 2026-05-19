@@ -49,4 +49,25 @@ $content = @(
 $utf8NoBom = New-Object System.Text.UTF8Encoding $false
 [System.IO.File]::WriteAllText($out, $content, $utf8NoBom)
 
+# 3. Reconcile skill symlinks — create symlinks for any repo skill that doesn't
+#    yet have one in ~/.claude/skills/. Conservative: never replaces or removes
+#    existing entries (that's the onboarder's job).
+$skillsRepo = Join-Path $repo 'skills'
+$skillsLive = Join-Path $HOME '.claude\skills'
+if (Test-Path $skillsRepo) {
+    New-Item -ItemType Directory -Force $skillsLive | Out-Null
+    foreach ($d in Get-ChildItem $skillsRepo -Directory) {
+        $link = Join-Path $skillsLive $d.Name
+        $exists = $null -ne (Get-Item -LiteralPath $link -Force -ErrorAction SilentlyContinue)
+        if (-not $exists) {
+            try {
+                New-Item -ItemType SymbolicLink -Path $link -Target $d.FullName -ErrorAction Stop | Out-Null
+                Log "common-config: linked skill $($d.Name)"
+            } catch {
+                if (-not $Quiet) { Write-Warning "common-config: failed to link skill $($d.Name) - $_" }
+            }
+        }
+    }
+}
+
 Log "common-config: refreshed ($host_)"

@@ -55,4 +55,26 @@ mkdir -p "$(dirname "$out")"
     cat "$device"
 } > "$out"
 
+# 3. Reconcile skill symlinks — create symlinks for any repo skill that doesn't
+#    yet have one in ~/.claude/skills/. Conservative: never replaces or removes
+#    existing entries (that's the onboarder's job).
+skills_repo="$repo/skills"
+skills_live="$HOME/.claude/skills"
+if [[ -d "$skills_repo" ]]; then
+    mkdir -p "$skills_live"
+    for d in "$skills_repo"/*/; do
+        [[ -d "$d" ]] || continue
+        name="$(basename "$d")"
+        link="$skills_live/$name"
+        # Only create if nothing's there (real file, dir, or symlink — all skipped)
+        if [[ ! -e "$link" && ! -L "$link" ]]; then
+            if ln -s "${d%/}" "$link" 2>/dev/null; then
+                log "common-config: linked skill $name"
+            else
+                [[ $quiet -eq 0 ]] && echo "common-config: failed to link skill $name" >&2
+            fi
+        fi
+    done
+fi
+
 log "common-config: refreshed ($host)"
